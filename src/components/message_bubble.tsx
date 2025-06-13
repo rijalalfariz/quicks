@@ -1,0 +1,166 @@
+import React, { useEffect, useState, Dispatch, useRef, RefObject } from 'react';
+import { Chat, Message, MessageAction } from "@/interfaces/interfaces";
+import DateText from './date_text';
+import Image from "next/image";
+import { deleteMessage } from '@/services/api';
+
+interface MessageBubbleProps {
+  activeChat: Chat;
+  message: Message;
+  isOwnMessage?: boolean;
+  activeOptionBubble?: number;
+  setActiveOptionBubble?: Dispatch<React.SetStateAction<number>>;
+  setMessageFIeldAction?: Dispatch<React.SetStateAction<MessageAction | null>>;
+  onDelete?: (messageId:number) => void;
+  scrollParentRef?: RefObject<HTMLDivElement | null>;
+}
+
+const MessageBubble: React.FC<MessageBubbleProps> = ({
+  activeChat,
+  message,
+  isOwnMessage = false,
+  activeOptionBubble = 0,
+  setActiveOptionBubble = () => { },
+  setMessageFIeldAction = () => { },
+  onDelete = () => {},
+  scrollParentRef
+}) => {
+  const lightBubbleColorList = [
+    "hsla(40,87%,91%,1)",
+    "hsla(165,55%,89%,1)",
+  ];
+  const darkBubbleColorList = [
+    "hsla(36,76%,58%,1)",
+    "hsla(158,46%,49%,1)",
+  ];
+
+  const kebabRef = useRef<HTMLImageElement>(null);
+  const [alignOption, setAlignOption] = useState("");
+  const [isShowOption, setIsShowOption] = useState(activeOptionBubble == message.id);
+
+  useEffect(() => {
+    setIsShowOption(activeOptionBubble == message.id);
+  }, [activeOptionBubble])
+
+  const getColorTheme = (mode: ("dark" | "light") = "light") => {
+    const participant = activeChat.participants.find(v => v.id == message.senderId);
+    let participantIndex = participant ? activeChat.participants.indexOf(participant) : -1;
+    let randomColors = `${participantIndex},${Math.max(...[30, 100 - participantIndex])}`;
+
+    if (mode == "light") {
+      if (isOwnMessage) {
+        return "hsla(271,100%,93%,1)";
+      }
+
+      if (participantIndex <= 1) {
+        return lightBubbleColorList[participantIndex];
+      }
+
+      return `hsla(${randomColors}%,90%,1)`;
+    } else {
+      if (isOwnMessage) {
+        return "hsla(271,70%,60%,1)";
+      }
+
+      if (participantIndex <= 1) {
+        return darkBubbleColorList[participantIndex];
+      }
+
+      return `hsla(${randomColors}%,59%,1)`;
+    }
+  }
+
+  return (
+    <div className={(isOwnMessage ? "justify-items-end" : "") + " w-full grid gap-[6px]"}>
+      <div className="font-bold" style={{ color: getColorTheme("dark") }}>
+        {isOwnMessage
+          ? "You"
+          : (activeChat.participants.find(v => v.id === message.senderId)?.name)
+        }
+      </div>
+      {message.replyTo && (
+        <div className="p-[10px] rounded-[5px] border-1 border-[var(--primary-1)] bg-[#f2f2f2]">
+          {(message.replyTo as Message).body}
+        </div>
+      )}
+      <div className={(isOwnMessage ? "flex-row-reverse" : "") + " flex items-start gap-[7px] w-fit min-w-[calc(8px+50%)] justify-between"}>
+        <div className="p-[10px] grid gap-[12px] rounded-[5px] break-words" style={{ backgroundColor: getColorTheme("light") }}>
+          <div className="overflow-hidden">
+            {message.body}
+          </div>
+          <DateText value={message.createdAt} mode={2} className="text-[12px] text-[var(--primary-3)]" />
+        </div>
+        <div className="relative cursor-pointer">
+          <Image
+            ref={kebabRef}
+            src="/images/kebab-x-gray.svg"
+            alt="click for more"
+            width={16}
+            height={16}
+            className="BubbleOptions min-w-4"
+            onClick={() => {
+              setActiveOptionBubble(activeOptionBubble == message.id ? 0 : message.id)
+              if (kebabRef.current) {
+                const rect = kebabRef.current.getBoundingClientRect();
+                const scrollRect = scrollParentRef?.current?.getBoundingClientRect();
+                let alignment = ""
+                const containerWidth = window.innerWidth;
+                const containerHeight = window.innerHeight;
+
+                // Decide alignment: if there's not enough space on the right, align left
+                const shouldAlignRight = containerWidth - rect.right < 190; // assume menu width ~150px
+                alignment = shouldAlignRight ? alignment + " right-0" : alignment;
+
+                const shouldAlignTop = containerHeight - rect.bottom < containerHeight - (scrollRect?.bottom||0) + 100; // assume menu width ~150px
+                alignment = shouldAlignTop ? alignment + " bottom-[18px]" : alignment;
+                setAlignOption(alignment);
+              }
+            }}
+          />
+          {isShowOption && (<>
+            <div className={"grid divide-y divide-[#bdbdbd] border-[#bdbdbd] border-1 rounded-[5px] w-[126px] absolute bg-white z-10 " + alignOption} >
+              {isOwnMessage
+                ? (
+                  <>
+                    <p className="text-[var(--primary)] text-[12px] p-[12px]" onClick={() => {
+                      setMessageFIeldAction({
+                        action: "edit",
+                        title: "Editing your message",
+                        body: message.body,
+                        relatedMessageId: message.id
+                      })
+                    }}>Edit</p>
+                    <p className="text-[var(--indicator-red)] text-[12px] p-[12px]" onClick={()=>{
+                      deleteMessage(message.id, activeChat.id)
+                      onDelete(message.id)
+                    }}>Delete</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-[var(--primary)] text-[12px] p-[12px]" onClick={() => {
+                      setMessageFIeldAction({
+                        action: "share",
+                        title: "Shared message",
+                        body: message.body,
+                        relatedMessageId: message.id
+                      })
+                    }}>Share</p>
+                    <p className="text-[var(--primary)] text-[12px] p-[12px]" onClick={() => {
+                      setMessageFIeldAction({
+                        action: "reply",
+                        title: "Replying to "+(activeChat.participants.find(v => v.id === message.senderId)?.name),
+                        body: message.body,
+                        relatedMessageId: message.id
+                      })
+                    }}>Reply</p>
+                  </>
+                )}
+            </div>
+          </>)}
+        </div>
+      </div>
+    </div >
+  );
+};
+
+export default MessageBubble;

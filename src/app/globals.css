@@ -2,7 +2,22 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #4F4F4F;
+  --primary: #2F80ED;
+  --primary-3: #4F4F4F;
+  --primary-2: #828282;
+  --primary-1: #E0E0E0;
+  --indicator-purple: #8785FF;
+  --indicator-orange: #F8B76B;
+  --indicator-red: #EB5757;
+  --indicator-yellow: #F2C94C;
+  --stickers-blue: #E9F3FF;
+  --stickers-orange: #FDCFA4;
+  --stickers-yellow: #F9E9C3;
+  --stickers-cyan: #AFEBDB;
+  --stickers-green: #CBF1C2;
+  --stickers-purple: #CFCEF9;
+  --stickers-magenta: #F9E0FD;
 }
 
 @theme inline {
@@ -10,17 +25,63 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-lato: var(--font-lato);
 }
 
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
   }
-}
+} */
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-lato);
+}
+
+@keyframes gradientBG {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes rotationBG {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-gradient-bg {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.animate-gradient-bg::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 300%;
+  background: linear-gradient(-45deg, #424656, #1b1f2d, #424656);
+  /* background: linear-gradient(-45deg, #a5b5ec, #e6efff, #ace0ff, #99aae0); */
+  background-size: 400% 400%;
+  animation: gradientBG 12s ease-in-out infinite, rotationBG 11s ease-in-out infinite;
+  z-index: -1;
 }
