@@ -15,6 +15,8 @@ interface ChatDetailProps {
   chatMessages?: Message[];
   setChatMessages?: Dispatch<React.SetStateAction<Message[]>>;
   currentUser?: User;
+  sharedMessage?: MessageAction | null;
+  setSharedMessage?: Dispatch<React.SetStateAction<MessageAction | null>>;
 }
 
 const ChatDetail: React.FC<ChatDetailProps> = ({
@@ -26,7 +28,9 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   chatMessages = [],
   setChatMessages = () => { },
   setActiveChat = () => { },
-  currentUser
+  currentUser,
+  sharedMessage,
+  setSharedMessage = () => { }
 }) => {
   const scrollContainer = useRef<HTMLDivElement | null>(null);
   const newMessageRef = useRef<HTMLDivElement | null>(null)
@@ -61,6 +65,12 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
 
       setHasScroll(container.scrollHeight > container.clientHeight);
     }
+
+    if (sharedMessage) {
+      console.log('sharedMessageaa', sharedMessage)
+
+      setMessageFIeldAction(sharedMessage);
+    }
   }, [chatMessages])
 
   useEffect(() => {
@@ -69,6 +79,11 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
     }
     if (messageFIeldAction?.action == "reply") {
       setRepliedMessage(messageFIeldAction.relatedMessageId)
+    }
+    if (messageFIeldAction?.action == "share" && sharedMessage === null) {
+      console.log('sharedMessage', sharedMessage)
+      setSharedMessage(messageFIeldAction as MessageAction)
+      setInboxPage("list")
     }
   }, [messageFIeldAction])
 
@@ -131,7 +146,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
 
 
       <div className="overflow-hidden h-full grid grid-rows-[1fr_min-content] content-between">
-        <div id="rizz" ref={scrollContainer} className={"overflow-y-auto grid grid-rows-[min-content] gap-[10px] py-[14px]"+(hasScroll ? " pl-[20px] pr-[2px]" : " px-[20px]")} onScroll={(e) => {
+        <div id="rizz" ref={scrollContainer} className={"overflow-y-auto grid grid-rows-[min-content] gap-[10px] py-[14px]" + (hasScroll ? " pl-[20px] pr-[2px]" : " px-[20px]")} onScroll={(e) => {
           clearTimeout(readTimeout)
           const scrollElem = e.target as HTMLDivElement;
           let scrollPoition = scrollElem.clientHeight + scrollElem.scrollTop + scrollElem.offsetTop
@@ -140,7 +155,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
           }
           // console.log('a', messageRefs.current[activeOptionBubble]?.offsetTop || 0, scrollElem.scrollTop)
           if (
-            (messageRefs.current[activeOptionBubble]?.offsetTop || 0) > (scrollPoition-70)
+            (messageRefs.current[activeOptionBubble]?.offsetTop || 0) > (scrollPoition - 70)
             || (messageRefs.current[activeOptionBubble]?.offsetTop || Infinity) < scrollElem.scrollTop
           ) {
             setActiveOptionBubble(0)
@@ -177,13 +192,13 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
                   activeChat={activeChat!}
                   message={{
                     ...message,
-                    replyTo: message.replyTo?chatMessages.find(v => v.id == message.replyTo):null
+                    replyTo: message.replyTo ? chatMessages.find(v => v.id == message.replyTo) : null
                   }}
                   isOwnMessage={message.senderId === currentUser?.id}
                   activeOptionBubble={activeOptionBubble}
                   setActiveOptionBubble={setActiveOptionBubble}
                   setMessageFIeldAction={setMessageFIeldAction}
-                  onDelete={async (messageId)=>{
+                  onDelete={async (messageId) => {
                     suppressNextOutsideClick.current = true;
 
                     const updatedMessageList = await getMessageList(activeChat?.id)
@@ -242,6 +257,8 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
                       setTypedMessage("")
                     }
                     setMessageFIeldAction(null)
+                    setSharedMessage(null)
+                    setRepliedMessage(null)
                   }}
                 />
               </div>
@@ -262,6 +279,8 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
               let newMessageData = await postMessage(activeChat?.id, currentUser, typedMessage, repliedMessage, messageFIeldAction)
               setChatMessages(newMessageData)
               setMessageFIeldAction(null)
+              setSharedMessage(null)
+              setRepliedMessage(null)
             }}
           >
             Send

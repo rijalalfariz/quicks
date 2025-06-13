@@ -79,7 +79,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
         }
       </div>
       {message.replyTo && (
-        <div className="p-[10px] rounded-[5px] border-1 border-[var(--primary-1)] bg-[#f2f2f2]">
+        <div className="p-[10px] rounded-[5px] border-1 border-[var(--primary-1)] bg-[#f2f2f2] w-fit">
           {(message.replyTo as Message).body}
         </div>
       )}

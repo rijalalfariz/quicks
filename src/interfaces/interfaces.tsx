@@ -22,6 +22,7 @@ export interface Message {
   body: string;
   createdAt: string; // ISO date string
   replyTo?: Message | number | null;
+  sharedContent?: string;
   isReaded: boolean;
 }
 

@@ -66,7 +66,7 @@ export async function postMessage(
   let currentTime = await getCurrentTime()
   let isLastMessage = true;
 
-  if (!messageFIeldAction || messageFIeldAction?.action == "reply") {
+  if (!messageFIeldAction || messageFIeldAction?.action == "reply" || messageFIeldAction?.action == "share") {
     messageData = messageData.map((v) => {
       return { ...v, isReaded: true }
     })
@@ -77,6 +77,7 @@ export async function postMessage(
       body: body,
       createdAt: currentTime,
       replyTo: replyTo,
+      sharedContent: messageFIeldAction?.body||"",
       isReaded: true,
     }
     messageData.push(newMessage)

@@ -2,7 +2,7 @@ import React, { Dispatch, RefObject, useEffect, useState } from 'react';
 import Image from 'next/image';
 import DateText from './date_text';
 import { getChatList, getMessageList } from '@/services/api';
-import { Chat, Message, User } from "@/interfaces/interfaces";
+import { Chat, Message, User, MessageAction } from "@/interfaces/interfaces";
 import ChatDetail from './chat_detail';
 
 interface InboxPanelProps {
@@ -12,6 +12,40 @@ interface InboxPanelProps {
   suppressNextOutsideClick: RefObject<boolean>;
   setInboxPage: Dispatch<React.SetStateAction<"list" | "detail">>;
   currentUser?: User;
+}
+
+function splitAndPreserve(text: string, highlight: string) {
+  const regex = new RegExp(`(${highlight})`, "gi");
+  const matches = [];
+  let lastIndex = 0;
+
+  text.replace(regex, (match, _, offset) => {
+    matches.push(text.slice(lastIndex, offset)); // before match
+    matches.push(match); // the match itself
+    lastIndex = offset + match.length;
+    return match;
+  });
+
+  matches.push(text.slice(lastIndex)); // after last match
+  return matches;
+}
+
+function HighlightedText({ text, highlight }: { text: string; highlight: string }) {
+  if (!highlight) return <>{text}</>;
+
+  const parts = splitAndPreserve(text, highlight);
+
+  return (
+    <>
+      {parts.map((part, i) =>
+        part.toLowerCase() === highlight.toLowerCase() ? (
+          <mark key={i} className="bg-yellow-300">{part}</mark>
+        ) : (
+          <span key={i}>{part}</span>
+        )
+      )}
+    </>
+  );
 }
 
 const InboxPanel: React.FC<InboxPanelProps> = ({
@@ -24,7 +58,9 @@ const InboxPanel: React.FC<InboxPanelProps> = ({
 }) => {
   const [chatMessages, setChatMessages] = useState<Message[]>([]);
   const [activeChat, setActiveChat] = useState<Chat | null>(null);
-  const [chats, setChats] = useState<Chat[] | null>(null)
+  const [chats, setChats] = useState<Chat[] | null>(null);
+  const [sharedMessage, setSharedMessage] = useState<MessageAction | null>(null);
+  const [keyword, setKeyword] = useState("");
 
   useEffect(() => {
     fetchChats();
@@ -67,6 +103,8 @@ const InboxPanel: React.FC<InboxPanelProps> = ({
               placeholder="Search"
               className="flex-1 outline-none bg-transparent text-gray-800 placeholder-[#333333]"
               style={{ border: "none", boxShadow: "none" }}
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
             />
             <Image
               src="/images/search.svg"
@@ -92,8 +130,8 @@ const InboxPanel: React.FC<InboxPanelProps> = ({
               <p className="text-[var(--primary-3)] mt-4 font-bold text-[16px]">Loading chats...</p>
             </div>
           ) : (
-            <div className="overflow-y-auto h-fit grid grid-cols-auto divide-y divide-[var(--primary-2)] max-h-full">
-              {chats?.map((chat) => (
+            <div className="overflow-y-auto h-fit grid grid-cols-[min-content_1fr] divide-y divide-[var(--primary-2)] max-h-full">
+              {[...(chats?.filter(v=> v.label.toLowerCase().includes(keyword.toLowerCase())) || [])].map((chat) => (
                 <div
                   key={chat.id}
                   className="grid grid-cols-subgrid col-span-2 items-start gap-4 py-[22px] cursor-pointer hover:bg-gray-50 h-fit"
@@ -171,11 +209,11 @@ const InboxPanel: React.FC<InboxPanelProps> = ({
                   </div>
                   <div>
                     <div className="flex gap-4">
-                      <h3 className="text-lg font-semibold text-[var(--primary)]">{chat.label}</h3>
+                      <h3 className="text-lg font-semibold text-[var(--primary)]">{HighlightedText({text:chat.label, highlight:keyword})}</h3>
                       <DateText value={chat.lastMessageAt} className="whitespace-nowrap" />
                     </div>
                     <div>
-                      {chat.isGroup && (<p className="font-bold">{(chat.lastMessageBy==currentUser?.id ? "You" : chat.participants.filter((v: any) => v.id == chat.lastMessageBy)[0].name)} : <br /></p>)}
+                      {chat.isGroup && (<p className="font-bold">{(chat.lastMessageBy == currentUser?.id ? "You" : chat.participants.filter((v: any) => v.id == chat.lastMessageBy)[0].name)} : <br /></p>)}
                       <div className="flex items-baseline justify-between gap-2">
                         <p className="text-sm text-gray-600 line-clamp-1">{chat.lastMessage}</p>
                         {!chat.isReaded && (
@@ -186,6 +224,11 @@ const InboxPanel: React.FC<InboxPanelProps> = ({
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+          {sharedMessage && (
+            <div className={"flex gap-[13px] items-center rounded-[5px] text-[var(--primary)] bg-[var(--stickers-blue)] p-3 transition-all duration-300 ease-in-out"}>
+              Select the chat you want to share this message with.
             </div>
           )}
         </div>
@@ -201,6 +244,8 @@ const InboxPanel: React.FC<InboxPanelProps> = ({
           setActiveChat={setActiveChat}
           currentUser={currentUser}
           setChatMessages={setChatMessages}
+          sharedMessage={sharedMessage}
+          setSharedMessage={setSharedMessage}
         />
       )}
     </div>
