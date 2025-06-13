@@ -11,8 +11,10 @@ interface MessageBubbleProps {
   activeOptionBubble?: number;
   setActiveOptionBubble?: Dispatch<React.SetStateAction<number>>;
   setMessageFIeldAction?: Dispatch<React.SetStateAction<MessageAction | null>>;
-  onDelete?: (messageId:number) => void;
+  onDelete?: (messageId: number) => void;
   scrollParentRef?: RefObject<HTMLDivElement | null>;
+  suppressNextOutsideClick: RefObject<boolean>;
+  suppressBubbleOptionClick: RefObject<boolean>;
 }
 
 const MessageBubble: React.FC<MessageBubbleProps> = ({
@@ -22,8 +24,10 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
   activeOptionBubble = 0,
   setActiveOptionBubble = () => { },
   setMessageFIeldAction = () => { },
-  onDelete = () => {},
-  scrollParentRef
+  onDelete = () => { },
+  scrollParentRef,
+  suppressNextOutsideClick,
+  suppressBubbleOptionClick
 }) => {
   const lightBubbleColorList = [
     "hsla(40,87%,91%,1)",
@@ -37,10 +41,18 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
   const kebabRef = useRef<HTMLImageElement>(null);
   const [alignOption, setAlignOption] = useState("");
   const [isShowOption, setIsShowOption] = useState(activeOptionBubble == message.id);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
   useEffect(() => {
     setIsShowOption(activeOptionBubble == message.id);
+    if (activeOptionBubble != message.id) {
+      setShowDeleteConfirm(false)
+    }
   }, [activeOptionBubble])
+
+  useEffect(() => {
+    console.log('suppressBubbleOptionClick3', suppressBubbleOptionClick)
+  }, [suppressBubbleOptionClick.current])
 
   const getColorTheme = (mode: ("dark" | "light") = "light") => {
     const participant = activeChat.participants.find(v => v.id == message.senderId);
@@ -78,9 +90,9 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
           : (activeChat.participants.find(v => v.id === message.senderId)?.name)
         }
       </div>
-      {message.replyTo && (
+      {(message.replyTo || message.sharedContent) && (
         <div className="p-[10px] rounded-[5px] border-1 border-[var(--primary-1)] bg-[#f2f2f2] w-fit">
-          {(message.replyTo as Message).body}
+          {(message.replyTo as Message)?.body || message.sharedContent}
         </div>
       )}
       <div className={(isOwnMessage ? "flex-row-reverse" : "") + " flex items-start gap-[7px] w-fit min-w-[calc(8px+50%)] justify-between"}>
@@ -111,7 +123,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
                 const shouldAlignRight = containerWidth - rect.right < 190; // assume menu width ~150px
                 alignment = shouldAlignRight ? alignment + " right-0" : alignment;
 
-                const shouldAlignTop = containerHeight - rect.bottom < containerHeight - (scrollRect?.bottom||0) + 100; // assume menu width ~150px
+                const shouldAlignTop = containerHeight - rect.bottom < containerHeight - (scrollRect?.bottom || 0) + 100; // assume menu width ~150px
                 alignment = shouldAlignTop ? alignment + " bottom-[18px]" : alignment;
                 setAlignOption(alignment);
               }
@@ -120,21 +132,46 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
           {isShowOption && (<>
             <div className={"grid divide-y divide-[#bdbdbd] border-[#bdbdbd] border-1 rounded-[5px] w-[126px] absolute bg-white z-10 " + alignOption} >
               {isOwnMessage
-                ? (
-                  <>
-                    <p className="text-[var(--primary)] text-[12px] p-[12px]" onClick={() => {
-                      setMessageFIeldAction({
-                        action: "edit",
-                        title: "Editing your message",
-                        body: message.body,
-                        relatedMessageId: message.id
-                      })
-                    }}>Edit</p>
-                    <p className="text-[var(--indicator-red)] text-[12px] p-[12px]" onClick={()=>{
-                      deleteMessage(message.id, activeChat.id)
-                      onDelete(message.id)
-                    }}>Delete</p>
-                  </>
+                ? (showDeleteConfirm
+                  ? (
+                    <>
+                      <p className="text-[12px] p-[12px] cursor-default" onClick={() => {
+                        suppressBubbleOptionClick.current = true;
+                      }}>Are you sure?</p>
+                      <div className="flex divide-x divide-[#bdbdbd]">
+                        <p className="text-[var(--indicator-red)] text-[12px] p-[12px] w-full text-center" onClick={() => {
+                          deleteMessage(message.id, activeChat.id)
+                          onDelete(message.id)
+                        }}>yes</p>
+                        <p className="text-[12px] p-[12px] w-full text-center" onClick={() => {
+                          suppressNextOutsideClick.current = true;
+                          suppressBubbleOptionClick.current = true;
+
+                          setShowDeleteConfirm(false);
+                        }}>No</p>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-[var(--primary)] text-[12px] p-[12px]" onClick={() => {
+                        setMessageFIeldAction({
+                          action: "edit",
+                          title: "Editing your message",
+                          body: message.body,
+                          relatedMessageId: message.id
+                        })
+                      }}>Edit</p>
+                      <p className="text-[var(--indicator-red)] text-[12px] p-[12px]" onClick={() => {
+                        suppressNextOutsideClick.current = true;
+                        suppressBubbleOptionClick.current = true;
+                        console.log('suppressBubbleOptionClick2', suppressBubbleOptionClick);
+                        setIsShowOption(true);
+                        setActiveOptionBubble(message.id);
+
+                        setShowDeleteConfirm(true);
+                      }}>Delete</p>
+                    </>
+                  )
                 ) : (
                   <>
                     <p className="text-[var(--primary)] text-[12px] p-[12px]" onClick={() => {
@@ -148,7 +185,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
                     <p className="text-[var(--primary)] text-[12px] p-[12px]" onClick={() => {
                       setMessageFIeldAction({
                         action: "reply",
-                        title: "Replying to "+(activeChat.participants.find(v => v.id === message.senderId)?.name),
+                        title: "Replying to " + (activeChat.participants.find(v => v.id === message.senderId)?.name),
                         body: message.body,
                         relatedMessageId: message.id
                       })

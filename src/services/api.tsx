@@ -99,7 +99,7 @@ export async function postMessage(
 
   if (isLastMessage) {
     let activeChatData = chatData.find(v => v.id == chatId) as Chat;
-    if (!messageFIeldAction) {
+    if (!messageFIeldAction || messageFIeldAction?.action == "reply" || messageFIeldAction?.action == "share") {
       activeChatData = {
         ...activeChatData,
         isReaded: true,

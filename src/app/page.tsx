@@ -18,7 +18,7 @@ export default function Home() {
   useEffect(() => {
     fetchCurrentUser();
 
-    document.addEventListener("click", (e) => {
+    const quicksClicksHandler = (e: MouseEvent) => {
       if (suppressNextOutsideClick.current) {
         suppressNextOutsideClick.current = false;
         return;
@@ -30,9 +30,10 @@ export default function Home() {
         setQuicksButtonActive(false);
         setActiveQuicks(null);
       }
-    });
+    }
+    document.addEventListener("click", quicksClicksHandler);
     return () => {
-      document.removeEventListener("click", () => { });
+      document.removeEventListener("click", quicksClicksHandler);
     };
   }, []);
 

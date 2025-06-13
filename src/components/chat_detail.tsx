@@ -40,20 +40,33 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   const [isNewMessageVissible, setIsNewMessageVissible] = useState(true);
   const [typedMessage, setTypedMessage] = useState("")
   const [repliedMessage, setRepliedMessage] = useState<Message | number | null>(null);
-  const [messageFIeldAction, setMessageFIeldAction] = useState<MessageAction | null>(null)
+  const [messageFIeldAction, setMessageFIeldAction] = useState<MessageAction | null>(null);
+  const suppressBubbleOptionClick = useRef(false);
 
   useEffect(() => {
     console.log('rerender1')
-    document.addEventListener("click", (e) => {
+    const clickHandler = (e: MouseEvent) => {
+      console.log("clicked trigger bubble", suppressBubbleOptionClick)
+      if (suppressBubbleOptionClick.current) {
+        suppressBubbleOptionClick.current = false;
+        return;
+      }
+
       const preferedElem = document.getElementsByClassName("BubbleOptions");
       if (preferedElem && Array.from(preferedElem).filter(v => v.contains(e.target as Node)).length == 0) {
         setActiveOptionBubble(0)
       }
-    });
+    }
+
+    document.addEventListener("click", clickHandler);
     return () => {
-      document.removeEventListener("click", () => { });
+      document.removeEventListener("click", clickHandler);
     };
   }, [])
+
+  useEffect(() => {
+    console.log('suppressBubbleOptionClick', suppressBubbleOptionClick)
+  }, [suppressBubbleOptionClick.current])
 
   useEffect(() => {
     const container = scrollContainer.current;
@@ -206,6 +219,8 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
                     setChatMessages(updatedMessageList)
                   }}
                   scrollParentRef={scrollContainer}
+                  suppressNextOutsideClick={suppressNextOutsideClick}
+                  suppressBubbleOptionClick={suppressBubbleOptionClick}
                 />
               </div>
             ))
