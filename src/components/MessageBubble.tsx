@@ -1,6 +1,6 @@
 import React, { useEffect, useState, Dispatch, useRef, RefObject } from 'react';
 import { Chat, Message, MessageAction } from "@/interfaces/interfaces";
-import DateText from './date_text';
+import DateText from './DateText';
 import Image from "next/image";
 import { deleteMessage } from '@/services/api';
 

@@ -1,9 +1,9 @@
 import React, { Dispatch, RefObject, useEffect, useState } from 'react';
 import Image from 'next/image';
-import DateText from './date_text';
+import DateText from './DateText';
 import { getChatList, getMessageList } from '@/services/api';
 import { Chat, Message, User, MessageAction } from "@/interfaces/interfaces";
-import ChatDetail from './chat_detail';
+import ChatDetail from './ChatDetail';
 
 interface InboxPanelProps {
   inboxPage: "list" | "detail";

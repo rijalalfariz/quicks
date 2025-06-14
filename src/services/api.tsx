@@ -38,6 +38,11 @@ export async function getMessageList(chatId = 1, local=false) {
   return data;
 }
 
+export async function getTaskList(local=false) {
+  const data = await getDataList(`tasks`, `tasks`, local);
+  return data;
+}
+
 export async function getCurrentUser() {
   const data = await getDataList('profile', 'profile');
   return data;

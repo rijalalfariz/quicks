@@ -1,9 +1,9 @@
 import React, { Dispatch, RefObject, useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import DateText, { DateTextRaw } from './date_text';
+import DateText, { DateTextRaw } from './DateText';
 import { getMessageList, postMessage, readMessage } from '@/services/api';
 import { Chat, Message, User, MessageAction } from "@/interfaces/interfaces";
-import MessageBubble from './message_bubble';
+import MessageBubble from './MessageBubble';
 
 interface ChatDetailProps {
   loading: boolean;

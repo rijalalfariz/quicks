@@ -32,3 +32,11 @@ export interface MessageAction {
   body: string;
   relatedMessageId: number;
 }
+
+export interface Task {
+  id: number;
+  title: string;
+  description: string;
+  dueDate: string;
+  isCompleted: boolean;
+}

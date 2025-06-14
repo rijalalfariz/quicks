@@ -1,11 +1,12 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import QuicksButton from "@/components/quicks_button";
+import QuicksButton from "@/components/QuicksButton";
 import { getCurrentUser } from "@/services/api";
-import DateText from "@/components/date_text";
-import InboxPanel from "@/components/inbox_panel";
+import DateText from "@/components/DateText";
+import InboxPanel from "@/components/InboxPanel";
 import { Chat, User } from "@/interfaces/interfaces";
+import TaskPanel from "@/components/TaskPanel";
 
 export default function Home() {
   const [quicksButtonActive, setQuicksButtonActive] = useState(false);
@@ -63,10 +64,10 @@ export default function Home() {
         <div className="grid gap-[15px] justify-items-end">
 
           {activeQuicks === "task" && (
-            <div className="bg-white p-5 shadow-lg rounded-lg QuicksContainer">
-              <h2 className="text-xl font-semibold mb-4">Task Details</h2>
-              <p className="text-gray-700">Here you can manage your tasks.</p>
-            </div>
+            <TaskPanel
+              loading={loading}
+              setLoading={setLoading}
+            />
           )}
 
           {activeQuicks === "inbox" && (
