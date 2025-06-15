@@ -213,7 +213,7 @@ const InboxPanel: React.FC<InboxPanelProps> = ({
                       <DateText value={chat.lastMessageAt} className="whitespace-nowrap" />
                     </div>
                     <div>
-                      {chat.isGroup && (<p className="font-bold">{(chat.lastMessageBy == currentUser?.id ? "You" : chat.participants.filter((v: any) => v.id == chat.lastMessageBy)[0].name)} : <br /></p>)}
+                      {chat.isGroup && (<p className="font-bold">{(chat.lastMessageBy == currentUser?.id ? "You" : chat.participants.filter((v) => v.id == chat.lastMessageBy)[0].name)} : <br /></p>)}
                       <div className="flex items-baseline justify-between gap-2">
                         <p className="text-sm text-gray-600 line-clamp-1">{chat.lastMessage}</p>
                         {!chat.isReaded && (
@@ -238,10 +238,8 @@ const InboxPanel: React.FC<InboxPanelProps> = ({
           activeChat={activeChat}
           chatMessages={chatMessages}
           loading={loading}
-          setLoading={setLoading}
           suppressNextOutsideClick={suppressNextOutsideClick}
           setInboxPage={setInboxPage}
-          setActiveChat={setActiveChat}
           currentUser={currentUser}
           setChatMessages={setChatMessages}
           sharedMessage={sharedMessage}

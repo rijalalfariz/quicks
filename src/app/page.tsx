@@ -3,9 +3,8 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import QuicksButton from "@/components/QuicksButton";
 import { getCurrentUser } from "@/services/api";
-import DateText from "@/components/DateText";
 import InboxPanel from "@/components/InboxPanel";
-import { Chat, User } from "@/interfaces/interfaces";
+import { User } from "@/interfaces/interfaces";
 import TaskPanel from "@/components/TaskPanel";
 
 export default function Home() {
@@ -59,7 +58,7 @@ export default function Home() {
 
   return (
     <div className="flex items-center justify-center min-h-screen animate-gradient-bg relative py-[27px] px-[34px]">
-      <h1 className="z-10 text-4xl font-bold text-[#9498aa] font-bold">Hi, I'm Fariz</h1>
+      <h1 className="z-10 text-4xl font-bold text-[#9498aa] font-bold">Hi, I&apos;m Fariz</h1>
       <div id="quicks-container" className="absolute bottom-0 right-0 py-[27px] px-[34px] z-50">
         <div className="grid gap-[15px] justify-items-end">
 
@@ -89,9 +88,11 @@ export default function Home() {
                 text="Task"
                 active={activeQuicks === "task"}
                 onClick={() => {
-                  activeQuicks === "task"
-                    ? setActiveQuicks(null)
-                    : setActiveQuicks("task");
+                  if (activeQuicks === "task") {
+                    setActiveQuicks(null);
+                  } else {
+                    setActiveQuicks("task");
+                  }
                 }}
                 quicksButtonActive={quicksButtonActive}
                 activeClassName="bg-[var(--indicator-orange)]"

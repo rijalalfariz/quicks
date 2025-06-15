@@ -7,11 +7,9 @@ import MessageBubble from './MessageBubble';
 
 interface ChatDetailProps {
   loading: boolean;
-  setLoading: Dispatch<React.SetStateAction<boolean>>;
   suppressNextOutsideClick: RefObject<boolean>;
   setInboxPage: Dispatch<React.SetStateAction<"list" | "detail">>;
   activeChat: Chat | null;
-  setActiveChat?: Dispatch<React.SetStateAction<Chat | null>>;
   chatMessages?: Message[];
   setChatMessages?: Dispatch<React.SetStateAction<Message[]>>;
   currentUser?: User;
@@ -21,13 +19,11 @@ interface ChatDetailProps {
 
 const ChatDetail: React.FC<ChatDetailProps> = ({
   loading,
-  setLoading,
   suppressNextOutsideClick,
   setInboxPage,
   activeChat,
   chatMessages = [],
   setChatMessages = () => { },
-  setActiveChat = () => { },
   currentUser,
   sharedMessage,
   setSharedMessage = () => { }
@@ -65,10 +61,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   }, [])
 
   useEffect(() => {
-    console.log('suppressBubbleOptionClick', suppressBubbleOptionClick)
-  }, [suppressBubbleOptionClick.current])
-
-  useEffect(() => {
     const container = scrollContainer.current;
     const target = newMessageRef.current;
 
@@ -80,8 +72,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
     }
 
     if (sharedMessage) {
-      console.log('sharedMessageaa', sharedMessage)
-
       setMessageFIeldAction(sharedMessage);
     }
   }, [chatMessages])
@@ -94,7 +84,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
       setRepliedMessage(messageFIeldAction.relatedMessageId)
     }
     if (messageFIeldAction?.action == "share" && sharedMessage === null) {
-      console.log('sharedMessage', sharedMessage)
       setSharedMessage(messageFIeldAction as MessageAction)
       setInboxPage("list")
     }
@@ -103,7 +92,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   let readTimeout = setTimeout(() => { }, 0)
 
   const readMessages = (scrollPoition: number = 0) => {
-    let readedId: number[] = [];
+    const readedId: number[] = [];
     let isLastMessage = false;
     chatMessages.filter(v => v.isReaded == false).map(v => {
       if ((messageRefs.current[v.id]?.offsetTop || 0) > (scrollPoition - 120)) {
@@ -113,7 +102,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
     })
 
     if (readedId.length > 0) {
-      console.log('read msg')
       readMessage(readedId, activeChat?.id, isLastMessage)
     }
   }
@@ -162,7 +150,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
         <div id="rizz" ref={scrollContainer} className={"overflow-y-auto grid grid-rows-[min-content] gap-[10px] py-[14px]" + (hasScroll ? " pl-[20px] pr-[2px]" : " px-[20px]")} onScroll={(e) => {
           clearTimeout(readTimeout)
           const scrollElem = e.target as HTMLDivElement;
-          let scrollPoition = scrollElem.clientHeight + scrollElem.scrollTop + scrollElem.offsetTop
+          const scrollPoition = scrollElem.clientHeight + scrollElem.scrollTop + scrollElem.offsetTop
           if (newMessageRef?.current?.offsetTop) {
             setIsNewMessageVissible(scrollPoition > newMessageRef?.current?.offsetTop)
           }
@@ -211,7 +199,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
                   activeOptionBubble={activeOptionBubble}
                   setActiveOptionBubble={setActiveOptionBubble}
                   setMessageFIeldAction={setMessageFIeldAction}
-                  onDelete={async (messageId) => {
+                  onDelete={async () => {
                     suppressNextOutsideClick.current = true;
 
                     const updatedMessageList = await getMessageList(activeChat?.id)
@@ -291,7 +279,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
             onClick={async () => {
               if (!typedMessage) return;
               setTypedMessage("")
-              let newMessageData = await postMessage(activeChat?.id, currentUser, typedMessage, repliedMessage, messageFIeldAction)
+              const newMessageData = await postMessage(activeChat?.id, currentUser, typedMessage, repliedMessage, messageFIeldAction)
               setChatMessages(newMessageData)
               setMessageFIeldAction(null)
               setSharedMessage(null)

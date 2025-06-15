@@ -53,19 +53,19 @@ export const getDateDifference = ({
   const fromDate = typeof from === "string" ? new Date(from) : from;
   const toDate = typeof _to === "string" ? new Date(_to) : _to;
 
-  let result = Math.floor((fromDate.getTime() - toDate.getTime()) / msPerIn);
+  const result = Math.floor((fromDate.getTime() - toDate.getTime()) / msPerIn);
 
   if (_in == "auto") {
-    let absResult = Math.abs(result);
+    const absResult = Math.abs(result);
     if (absResult > (24 * 60)) {
-      let tempSuffix = absResult > (2 * 24 * 60) ? "Days" : "Day";
+      const tempSuffix = absResult > (2 * 24 * 60) ? "Days" : "Day";
       return getDateDifference({ from, to: _to, in: "day", suffix: tempSuffix })
     }
     if (absResult > 60) {
-      let tempSuffix = absResult > (2 * 60) ? "Hours" : "Hour";
+      const tempSuffix = absResult > (2 * 60) ? "Hours" : "Hour";
       return getDateDifference({ from, to: _to, in: "hour", suffix: tempSuffix })
     }
-    let tempSuffix = absResult > (2 * 60) ? "Minutes" : "Minute";
+    const tempSuffix = absResult > (2 * 60) ? "Minutes" : "Minute";
     return { result, suffix: tempSuffix }
   }
   return { result, suffix: _suffix };

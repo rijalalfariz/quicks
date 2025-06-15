@@ -11,7 +11,7 @@ interface MessageBubbleProps {
   activeOptionBubble?: number;
   setActiveOptionBubble?: Dispatch<React.SetStateAction<number>>;
   setMessageFIeldAction?: Dispatch<React.SetStateAction<MessageAction | null>>;
-  onDelete?: (messageId: number) => void;
+  onDelete?: () => void;
   scrollParentRef?: RefObject<HTMLDivElement | null>;
   suppressNextOutsideClick: RefObject<boolean>;
   suppressBubbleOptionClick: RefObject<boolean>;
@@ -56,8 +56,8 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
 
   const getColorTheme = (mode: ("dark" | "light") = "light") => {
     const participant = activeChat.participants.find(v => v.id == message.senderId);
-    let participantIndex = participant ? activeChat.participants.indexOf(participant) : -1;
-    let randomColors = `${participantIndex},${Math.max(...[30, 100 - participantIndex])}`;
+    const participantIndex = participant ? activeChat.participants.indexOf(participant) : -1;
+    const randomColors = `${participantIndex},${Math.max(...[30, 100 - participantIndex])}`;
 
     if (mode == "light") {
       if (isOwnMessage) {
@@ -141,7 +141,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
                       <div className="flex divide-x divide-[#bdbdbd]">
                         <p className="text-[var(--indicator-red)] text-[12px] p-[12px] w-full text-center" onClick={() => {
                           deleteMessage(message.id, activeChat.id)
-                          onDelete(message.id)
+                          onDelete()
                         }}>yes</p>
                         <p className="text-[12px] p-[12px] w-full text-center" onClick={() => {
                           suppressNextOutsideClick.current = true;

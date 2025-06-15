@@ -1,5 +1,4 @@
 import { Chat, Message, MessageAction, Task, User } from "@/interfaces/interfaces";
-import { get } from "http";
 
 const BASE_URL = 'https://my-json-server.typicode.com/rijalalfariz/api-riz';
 
@@ -50,7 +49,7 @@ export async function getCurrentUser() {
 
 export async function getCurrentTime() { // fake UTC
   const now = new Date();
-  const pad = (n: any) => String(n).padStart(2, '0');
+  const pad = (n: number) => String(n).padStart(2, '0');
   const ms = String(now.getMilliseconds()).padStart(3, '0');
 
   return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}` +
@@ -68,7 +67,7 @@ export async function postMessage(
   const chatLocalData = localStorage.getItem(`chatData`) || "";
   let messageData = JSON.parse(messageLocalData) as Message[]
   let chatData = JSON.parse(chatLocalData) as Chat[]
-  let currentTime = await getCurrentTime()
+  const currentTime = await getCurrentTime()
   let isLastMessage = true;
 
   if (!messageFIeldAction || messageFIeldAction?.action == "reply" || messageFIeldAction?.action == "share") {
@@ -175,13 +174,13 @@ export async function deleteMessage(id=0, chatId=0) {
 
   let messageData = JSON.parse(messageLocalData) as Message[]
   let chatData = JSON.parse(chatLocalData) as Chat[]
-  let isLastMessage = messageData.findIndex(v => v.id == id)==messageData.length-1;
+  const isLastMessage = messageData.findIndex(v => v.id == id)==messageData.length-1;
 
   messageData = [...messageData.filter(v => v.id!=id)]
 
   if (isLastMessage) {
     let activeChatData = chatData.find(v => v.id == chatId) as Chat;
-    let lastMessage = messageData[messageData.length-1]
+    const lastMessage = messageData[messageData.length-1]
     activeChatData = {
       ...activeChatData,
       isReaded: true,
@@ -203,7 +202,7 @@ export async function deleteMessage(id=0, chatId=0) {
   localStorage.setItem(`message${chatId}DataTimestamp`, Date.now().toString());
 }
 
-export async function completeTask(completed=true, taskId=0, local=false) {
+export async function completeTask(completed=true, taskId=0) {
   const taskData = JSON.parse(localStorage.getItem(`taskData`) || "[]") as Task[];
   const updatedTaskData = taskData.map(v => {
     if (v.id == taskId){
@@ -230,7 +229,7 @@ export async function deleteTask(taskId: number) {
   localStorage.setItem(`taskDataTimestamp`, Date.now().toString());
 }
 
-export async function updateTask(taskId:number, task:Task, local=false) {
+export async function updateTask(taskId:number, task:Task) {
   const taskData = JSON.parse(localStorage.getItem(`taskData`) || "[]") as Task[];
 
   const updatedTaskData = taskData.map(v => {

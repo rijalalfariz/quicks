@@ -1,8 +1,7 @@
-import React, { Dispatch, RefObject, use, useEffect, useRef, useState } from "react";
+import React, { Dispatch, RefObject, useEffect, useRef, useState } from "react";
 import { Task } from "@/interfaces/interfaces";
 import Image from "next/image";
-import { completeTask } from "@/services/api";
-import DateText, { getDateDifference } from "./DateText";
+import { getDateDifference } from "./DateText";
 import StickerPill, { stickerObj } from "./StickerPill"
 
 interface TaskItemProps {
@@ -295,35 +294,35 @@ const TaskItem: React.FC<TaskItemProps> = ({
             />
             <div className="flex flex-wrap gap-[10px]">
               {task.stickers?.map(v => 
-                <StickerPill sticker={v}/>
+                <StickerPill key={v} sticker={v}/>
               )}
             </div>
 
             {showStickerDropdown && (
-              <div className="absolute z-10 bg-white grid gap-[10px] p-4 rounded-[5px] border-1 border-[var(--primary-2)] w-[277px] top-[40px]">
-                {Object.entries(stickerObj).map(([key, v]) => (
+                <div className="absolute z-10 bg-white grid gap-[10px] p-4 rounded-[5px] border-1 border-[var(--primary-2)] w-[277px] top-[40px]">
+                {Object.entries(stickerObj).map(([key]) => (
                   <div
-                    key={key}
-                    className="cursor-pointer"
-                    onClick={() => {
-                      const stickerNum = Number(key);
-                      const hasSticker = task.stickers?.includes(stickerNum);
-                      const updatedStickers = hasSticker
-                        ? task.stickers?.filter(s => s !== stickerNum)
-                        : [...(task.stickers || []), stickerNum];
-                      onUpdate(task.id, {
-                        ...task,
-                        stickers: updatedStickers,
-                      });
-                    }}
+                  key={key}
+                  className="cursor-pointer"
+                  onClick={() => {
+                    const stickerNum = Number(key);
+                    const hasSticker = task.stickers?.includes(stickerNum);
+                    const updatedStickers = hasSticker
+                    ? task.stickers?.filter(s => s !== stickerNum)
+                    : [...(task.stickers || []), stickerNum];
+                    onUpdate(task.id, {
+                    ...task,
+                    stickers: updatedStickers,
+                    });
+                  }}
                   >
-                    <StickerPill
-                      sticker={Number(key)}
-                      active={task.stickers?.includes(Number(key))}
-                    />
+                  <StickerPill
+                    sticker={Number(key)}
+                    active={task.stickers?.includes(Number(key))}
+                  />
                   </div>
                 ))}
-              </div>
+                </div>
             )}
           </div>
         </div>

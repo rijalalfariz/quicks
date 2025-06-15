@@ -1,6 +1,5 @@
 import React, { Dispatch, RefObject, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import DateText from './DateText';
 import { Task, TaskMode } from '@/interfaces/interfaces';
 import { completeTask, createTask, deleteTask, getTaskList, updateTask } from '@/services/api';
 import TaskItem from './TaskItem';
@@ -20,7 +19,7 @@ const TaskPanel: React.FC<TaskPanelProps> = ({
   const [tasks, setTasks] = useState<Task[] | null>(null);
   const [selectedTaskMode, setSelectedTaskMode] = useState<TaskMode>("My Task");
   const [showTaskModeOption, setShowTaskModeOption] = useState(false);
-  const [taskModeOptions, setTaskModeOptions] = useState<TaskMode[]>(["My Task", "Personal Errand", "Urgently To-Do"]);
+  const [taskModeOptions] = useState<TaskMode[]>(["My Task", "Personal Errand", "Urgently To-Do"]);
   const [activeTaskAction, setActiveTaskAction] = useState(0);
   const [activeDescTaskField, setActiveDescTaskField] = useState(0);
   const [activeTaskStickers, setActiveTaskStickers] = useState(0);
