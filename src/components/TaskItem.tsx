@@ -247,7 +247,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
               />
             </button>
           </div>
-          <div className="TaskDescFieldContainer col-span-2 grid grid-cols-subgrid items-start">
+          <div className="TaskDescFieldContainer col-span-2 grid grid-cols-subgrid items-baseline">
             <Image
               src={"/images/pencil-" + (task.description ? "blue" : "gray") + ".svg"}
               alt="pencil"
@@ -273,6 +273,13 @@ const TaskItem: React.FC<TaskItemProps> = ({
                   style={{
                     height: descFieldHeight + 18
                   }}
+                  onBlur={() => {
+                    onUpdate(task.id, {
+                      ...task,
+                      description: description
+                    })
+                    setShowDescField(false)
+                  }}
                 ></textarea>
               ) : (
                 <div ref={descriptionRef} className="cursor-pointer"
@@ -287,7 +294,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
           </div>
           <div className="col-span-2 grid grid-cols-subgrid items-start relative">
             <Image
-              src={"/images/bookmarks-"+(task.stickers?.length?"blue":"gray")+".svg"}
+              src={"/images/bookmarks-" + (task.stickers?.length ? "blue" : "gray") + ".svg"}
               alt="clock"
               width={19}
               height={20}
@@ -297,36 +304,36 @@ const TaskItem: React.FC<TaskItemProps> = ({
               }}
             />
             <div className="flex flex-wrap gap-[10px]">
-              {task.stickers?.map(v => 
-                <StickerPill key={v} sticker={v}/>
+              {task.stickers?.map(v =>
+                <StickerPill key={v} sticker={v} />
               )}
             </div>
 
             {showStickerDropdown && (
-                <div className="absolute z-10 bg-white grid gap-[10px] p-4 rounded-[5px] border-1 border-[var(--primary-2)] w-[277px] top-[40px]">
+              <div className="TaskStickersContainer absolute z-10 bg-white grid gap-[10px] p-4 rounded-[5px] border-1 border-[var(--primary-2)] w-[277px] top-[40px]">
                 {Object.entries(stickerObj).map(([key]) => (
                   <div
-                  key={key}
-                  className="cursor-pointer"
-                  onClick={() => {
-                    const stickerNum = Number(key);
-                    const hasSticker = task.stickers?.includes(stickerNum);
-                    const updatedStickers = hasSticker
-                    ? task.stickers?.filter(s => s !== stickerNum)
-                    : [...(task.stickers || []), stickerNum];
-                    onUpdate(task.id, {
-                    ...task,
-                    stickers: updatedStickers,
-                    });
-                  }}
+                    key={key}
+                    className="cursor-pointer"
+                    onClick={() => {
+                      const stickerNum = Number(key);
+                      const hasSticker = task.stickers?.includes(stickerNum);
+                      const updatedStickers = hasSticker
+                        ? task.stickers?.filter(s => s !== stickerNum)
+                        : [...(task.stickers || []), stickerNum];
+                      onUpdate(task.id, {
+                        ...task,
+                        stickers: updatedStickers,
+                      });
+                    }}
                   >
-                  <StickerPill
-                    sticker={Number(key)}
-                    active={task.stickers?.includes(Number(key))}
-                  />
+                    <StickerPill
+                      sticker={Number(key)}
+                      active={task.stickers?.includes(Number(key))}
+                    />
                   </div>
                 ))}
-                </div>
+              </div>
             )}
           </div>
         </div>
