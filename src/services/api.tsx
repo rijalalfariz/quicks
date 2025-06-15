@@ -1,4 +1,4 @@
-import { Chat, Message, MessageAction, User } from "@/interfaces/interfaces";
+import { Chat, Message, MessageAction, Task, User } from "@/interfaces/interfaces";
 import { get } from "http";
 
 const BASE_URL = 'https://my-json-server.typicode.com/rijalalfariz/api-riz';
@@ -39,7 +39,7 @@ export async function getMessageList(chatId = 1, local=false) {
 }
 
 export async function getTaskList(local=false) {
-  const data = await getDataList(`tasks`, `tasks`, local);
+  const data = await getDataList(`task`, `tasks`, local);
   return data;
 }
 
@@ -201,4 +201,56 @@ export async function deleteMessage(id=0, chatId=0) {
 
   localStorage.setItem(`message${chatId}Data`, JSON.stringify(messageData));
   localStorage.setItem(`message${chatId}DataTimestamp`, Date.now().toString());
+}
+
+export async function completeTask(completed=true, taskId=0, local=false) {
+  const taskData = JSON.parse(localStorage.getItem(`taskData`) || "[]") as Task[];
+  const updatedTaskData = taskData.map(v => {
+    if (v.id == taskId){
+      return {
+        ...v,
+        isCompleted: completed
+      }
+    }
+    return v
+  });
+
+  localStorage.setItem(`taskData`, JSON.stringify(updatedTaskData));
+  localStorage.setItem(`taskDataTimestamp`, Date.now().toString());
+
+  return updatedTaskData;
+}
+
+export async function deleteTask(taskId: number) {
+  const taskData = JSON.parse(localStorage.getItem(`taskData`) || "[]") as Task[];
+
+  const updatedTaskData = taskData.filter(v => v.id != taskId);
+
+  localStorage.setItem(`taskData`, JSON.stringify(updatedTaskData));
+  localStorage.setItem(`taskDataTimestamp`, Date.now().toString());
+}
+
+export async function updateTask(taskId:number, task:Task, local=false) {
+  const taskData = JSON.parse(localStorage.getItem(`taskData`) || "[]") as Task[];
+
+  const updatedTaskData = taskData.map(v => {
+    if (v.id == taskId) return task;
+    return v;
+  });
+
+  localStorage.setItem(`taskData`, JSON.stringify(updatedTaskData));
+  localStorage.setItem(`taskDataTimestamp`, Date.now().toString());
+
+  return updatedTaskData;
+}
+
+export async function createTask(task: Task) {
+  const taskData = JSON.parse(localStorage.getItem(`taskData`) || "[]") as Task[];
+
+  const updatedTaskData = [...taskData, task];
+
+  localStorage.setItem(`taskData`, JSON.stringify(updatedTaskData));
+  localStorage.setItem(`taskDataTimestamp`, Date.now().toString());
+
+  return updatedTaskData;  
 }

@@ -39,4 +39,9 @@ export interface Task {
   description: string;
   dueDate: string;
   isCompleted: boolean;
+  taskMode: TaskMode;
+  newTask?: boolean;
+  stickers?: number[];
 }
+
+export type TaskMode = "My Task" | "Personal Errand" | "Urgently To-Do";

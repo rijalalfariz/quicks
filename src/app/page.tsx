@@ -67,6 +67,7 @@ export default function Home() {
             <TaskPanel
               loading={loading}
               setLoading={setLoading}
+              suppressNextOutsideClick={suppressNextOutsideClick}
             />
           )}
 
