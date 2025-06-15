@@ -40,7 +40,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   const suppressBubbleOptionClick = useRef(false);
 
   useEffect(() => {
-    console.log('rerender1')
     const clickHandler = (e: MouseEvent) => {
       console.log("clicked trigger bubble", suppressBubbleOptionClick)
       if (suppressBubbleOptionClick.current) {
@@ -153,8 +152,9 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
           const scrollPoition = scrollElem.clientHeight + scrollElem.scrollTop + scrollElem.offsetTop
           if (newMessageRef?.current?.offsetTop) {
             setIsNewMessageVissible(scrollPoition > newMessageRef?.current?.offsetTop)
+          } else {
+            setIsNewMessageVissible(true)
           }
-          // console.log('a', messageRefs.current[activeOptionBubble]?.offsetTop || 0, scrollElem.scrollTop)
           if (
             (messageRefs.current[activeOptionBubble]?.offsetTop || 0) > (scrollPoition - 70)
             || (messageRefs.current[activeOptionBubble]?.offsetTop || Infinity) < scrollElem.scrollTop

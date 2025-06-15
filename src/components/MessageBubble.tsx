@@ -84,7 +84,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
 
   return (
     <div className={(isOwnMessage ? "justify-items-end" : "") + " w-full grid gap-[6px]"}>
-      <div className="font-bold" style={{ color: getColorTheme("dark") }}>
+      <div className="font-bold" style={{ color: activeChat.isGroup||isOwnMessage? getColorTheme("dark"):"var(--primary)" }}>
         {isOwnMessage
           ? "You"
           : (activeChat.participants.find(v => v.id === message.senderId)?.name)
@@ -96,7 +96,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
         </div>
       )}
       <div className={(isOwnMessage ? "flex-row-reverse" : "") + " flex items-start gap-[7px] w-fit min-w-[calc(8px+50%)] justify-between"}>
-        <div className="p-[10px] grid gap-[12px] rounded-[5px] break-words" style={{ backgroundColor: getColorTheme("light") }}>
+        <div className="p-[10px] grid gap-[12px] rounded-[5px] break-words" style={{ backgroundColor: activeChat.isGroup||isOwnMessage?getColorTheme("light"):"#f8f8f8" }}>
           <div className="overflow-hidden">
             {message.body}
           </div>
