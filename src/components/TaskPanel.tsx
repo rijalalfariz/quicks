@@ -183,7 +183,7 @@ const TaskPanel: React.FC<TaskPanelProps> = ({
             <p className="text-[var(--primary-3)] mt-4 font-bold text-[16px]">Loading Task List...</p>
           </div>
         ) : (
-          <div ref={taskScrollRef} className="grid divide-y divide-[var(--primary-2)] pr-[32px] pl-[32px] overflow-y-auto max-h-full h-fit">
+          <div ref={taskScrollRef} className="grid divide-y divide-[var(--primary-2)] pr-[32px] pl-[32px] overflow-y-auto max-h-full grid-rows-[min-content]">
             {[...(tasks || []).filter(v => v.taskMode == selectedTaskMode)]?.map(task => (
               <TaskItem
                 key={task.id}

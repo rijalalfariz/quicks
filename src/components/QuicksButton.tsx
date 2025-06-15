@@ -32,7 +32,7 @@ const QuicksButton: React.FC<QuicksButtonProps> = ({
         </span>
       }
       <button
-        className={(active ? activeClassName + " ml-[16px]" : "bg-white") + " w-[60px] h-[60px] rounded-full border-none text-gray-500 flex items-center justify-center shadow-sm transition-all duration-200 ease-in-out relative z-1"}
+        className={(active ? activeClassName + " ml-[16px]" : "bg-white") + " w-[60px] h-[60px] rounded-full border-none text-gray-500 flex items-center justify-center shadow-sm transition-all duration-200 ease-in-out relative z-1 cursor-pointer"}
         onClick={onClick}
         aria-pressed={active}
         style={{ boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.1)" }}

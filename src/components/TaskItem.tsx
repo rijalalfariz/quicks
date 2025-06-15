@@ -34,6 +34,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
   const taskDetailRef = useRef<HTMLDivElement | null>(null);
   const descriptionRef = useRef<HTMLDivElement | null>(null);
   const inputDateRef = useRef<HTMLInputElement | null>(null);
+  const taskItemRef = useRef<HTMLDivElement | null>(null);
   const dueDateDifference = getDateDifference({ from: task.dueDate });
   const [showTaskDetail, setShowTaskDetail] = useState(!task.isCompleted);
   const [showTaskOption, setShowTaskOption] = useState(false);
@@ -65,6 +66,9 @@ const TaskItem: React.FC<TaskItemProps> = ({
 
   useEffect(() => {
     setShowStickerDropdown(activeTaskStickers == task.id)
+    if (taskItemRef.current && activeTaskStickers == task.id) {
+      // taskItemRef.current.style.height = taskItemRef.current.scrollHeight+'px';
+    }
   }, [activeTaskStickers])
 
   useEffect(() => {
@@ -101,7 +105,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
   };
 
   return (
-    <div className={"py-[22px] flex gap-[18px]" + (task.newTask ? " NewTaskContainer" : "")}>
+    <div ref={taskItemRef} className={"py-[22px] flex gap-[18px] h-fit" + (task.newTask ? " NewTaskContainer" : "")}>
       <div className="cursor-pointer">
         {task.isCompleted
           ? (
@@ -198,14 +202,14 @@ const TaskItem: React.FC<TaskItemProps> = ({
             </div>
           </div>
         </div>
-        <div ref={taskDetailRef} className={"transition-all duration-300 grid gap-3" + (showTaskDetail ? " mt-4" : " mt-0")}
+        <div ref={taskDetailRef} className={"transition-all duration-300 grid gap-3 grid-cols-[20px_1fr]" + (showTaskDetail ? " mt-4" : " mt-0")}
           style={{
             height: inlineHeight,
             overflow: taskDetailOverflow,
           }}
           onTransitionEnd={handleTransitionEnd}
         >
-          <div className="flex gap-[18px] items-center">
+          <div className="col-span-2 grid grid-cols-subgrid items-center">
             <Image
               src={"/images/clock-" + (task.dueDate ? "blue" : "gray") + ".svg"}
               alt="clock"
@@ -213,7 +217,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
               height={20}
               className=""
             />
-            <button className="relative rounded-[5px] border-1 border-[var(--primary-2)] py-2 pr-[13px] pl-[14px] flex min-w-[193px] justify-between"
+            <button className="w-fit relative rounded-[5px] border-1 border-[var(--primary-2)] py-2 pr-[13px] pl-[14px] flex min-w-[193px] justify-between"
               onClick={() => {
                 inputDateRef.current?.showPicker?.();
                 // inputDateRef.current?.click();
@@ -243,13 +247,13 @@ const TaskItem: React.FC<TaskItemProps> = ({
               />
             </button>
           </div>
-          <div className="TaskDescFieldContainer flex gap-[18px] items-start">
+          <div className="TaskDescFieldContainer col-span-2 grid grid-cols-subgrid items-start">
             <Image
               src={"/images/pencil-" + (task.description ? "blue" : "gray") + ".svg"}
               alt="pencil"
-              width={20}
-              height={20}
-              className="min-w-5 cursor-pointer"
+              width={15}
+              height={15}
+              className="cursor-pointer"
               onClick={() => {
                 if (showDescField) {
                   onUpdate(task.id, {
@@ -281,7 +285,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
                 </div>
               )}
           </div>
-          <div className="flex gap-[18px] items-start relative">
+          <div className="col-span-2 grid grid-cols-subgrid items-start relative">
             <Image
               src={"/images/bookmarks-"+(task.stickers?.length?"blue":"gray")+".svg"}
               alt="clock"

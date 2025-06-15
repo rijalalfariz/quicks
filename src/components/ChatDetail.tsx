@@ -120,7 +120,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
             alt="back"
             width={24}
             height={24}
-            className="inline-block mr-2"
+            className="inline-block mr-2 cursor-pointer"
           />
         </button>
         <div className="w-full">
@@ -140,14 +140,14 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
             alt="participant"
             width={14}
             height={14}
-            className="text-white"
+            className="text-white cursor-pointer"
           />
         </button>
       </div>
 
 
       <div className="overflow-hidden h-full grid grid-rows-[1fr_min-content] content-between">
-        <div id="rizz" ref={scrollContainer} className={"overflow-y-auto grid grid-rows-[min-content] gap-[10px] py-[14px]" + (hasScroll ? " pl-[20px] pr-[2px]" : " px-[20px]")} onScroll={(e) => {
+        <div ref={scrollContainer} className={"overflow-y-auto grid grid-rows-[min-content] gap-[10px] py-[14px]" + (hasScroll ? " pl-[20px] pr-[2px]" : " px-[20px]")} onScroll={(e) => {
           clearTimeout(readTimeout)
           const scrollElem = e.target as HTMLDivElement;
           const scrollPoition = scrollElem.clientHeight + scrollElem.scrollTop + scrollElem.offsetTop

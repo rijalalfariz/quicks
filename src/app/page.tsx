@@ -115,7 +115,7 @@ export default function Home() {
                 hasActiveQuicks={activeQuicks !== null}
               />
             </div>
-            <button className={(activeQuicks ? "-ml-[86px] opacity-0 pointer-events-none d-none" : "") + " transition-all duration-300 ease-in-out w-[68px] h-[68px] p-[6px] rounded-full bg-[var(--primary)] shadow-[0px_4px_4px_0px_#0000001A] relative z-1"}
+            <button className={(activeQuicks ? "-ml-[86px] opacity-0 pointer-events-none d-none" : "") + " transition-all duration-300 ease-in-out w-[68px] h-[68px] p-[6px] rounded-full bg-[var(--primary)] shadow-[0px_4px_4px_0px_#0000001A] relative z-1 cursor-pointer"}
               onClick={() => {
                 if (quicksButtonActive) {
                   setActiveQuicks(null);
